@@ -29,7 +29,8 @@ define nginx::site(
     $source  = undef,
     $ensure  = present,
     $enabled = true,
-) {
+)
+{
     include ::nginx
 
     $basename = regsubst($title, '\W', '-', 'G')

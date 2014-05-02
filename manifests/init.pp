@@ -14,7 +14,8 @@
 #
 class nginx(
     $managed = true,
-) {
+)
+{
     package { [ 'nginx-full', 'nginx-full-dbg' ]: }
 
     service { 'nginx':
