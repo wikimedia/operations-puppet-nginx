@@ -4,6 +4,10 @@
 # This module is very small and simple, providing an 'nginx::site' resource
 # type that takes an Nginx configuration file as input.
 #
+# This also installs the nginx-common package by default explicitly, so
+# other code can require that package to do things after install but potentially
+# before the service starts.
+#
 # === Parameters
 #
 # [*managed*]
@@ -12,17 +16,27 @@
 #   false, the service will need to be manually restarted for the
 #   configuration changes to take effect.
 #
+# [*variant*]
+#   Which variant of the nginx package to install. Must be one of
+#   'full', 'light' or 'extras', which respectively install one of
+#   'nginx-full', 'nginx-light' or 'nginx-extras' packages.
+#
 class nginx(
     $managed = true,
+    $variant = 'full',
 )
 {
-    package { [ 'nginx-full', 'nginx-full-dbg' ]: }
+    if $variant !~ /^(full|extras|light$)/ {
+        fail("'variant' must be 'full', 'extras', or 'light' (got: '${variant}').")
+    }
+
+    package { [ "nginx-${variant}", "nginx-${variant}-dbg", 'nginx-common' ]: }
 
     service { 'nginx':
         enable     => true,
         provider   => 'debian',
         hasrestart => true,
-        require    => Package['nginx-full'],
+        require    => Package["nginx-${variant}"],
     }
 
     file { [ '/etc/nginx/conf.d', '/etc/nginx/sites-available', '/etc/nginx/sites-enabled' ]:
@@ -30,7 +44,7 @@ class nginx(
         recurse => true,
         purge   => true,
         force   => true,
-        require => Package['nginx-full'],
+        require => Package["nginx-${variant}"],
     }
 
     if $managed {
