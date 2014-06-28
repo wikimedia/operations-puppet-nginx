@@ -30,7 +30,7 @@ class nginx(
         fail("'variant' must be 'full', 'extras', or 'light' (got: '${variant}').")
     }
 
-    package { [ "nginx-${variant}", "nginx-${variant}-dbg", 'nginx-common' ]: }
+    package { [ "nginx-${variant}", 'nginx-common' ]: }
 
     service { 'nginx':
         enable     => true,
