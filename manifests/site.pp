@@ -15,6 +15,10 @@
 #   The Nginx site configuration as a Puppet file reference.
 #   Either this or 'content' must be set.
 #
+# [*ensure*]
+#   'present' or 'absent'; whether the site configuration is
+#   installed or removed in sites-available/
+#
 # [*enabled*]
 #   Boolean; true by default.
 #
@@ -35,17 +39,22 @@ define nginx::site(
 
     $basename = regsubst($title, '\W', '-', 'G')
 
-    if $ensure == 'present' {
-        file { "/etc/nginx/sites-available/${basename}":
-            content => $content,
-            source  => $source,
-        }
+    file { "/etc/nginx/sites-available/${basename}":
+        content => $content,
+        source  => $source,
+        ensure  => $ensure
+    }
 
-        if $enabled == true {
-            file { "/etc/nginx/sites-enabled/${basename}":
-                ensure => link,
-                target => "/etc/nginx/sites-available/${basename}",
-            }
+    if $ensure == 'present' and $enabled == true {
+        file { "/etc/nginx/sites-enabled/${basename}":
+            require => File["/etc/nginx/sites-available/${basename}"],
+            ensure  => link,
+            target  => "/etc/nginx/sites-available/${basename}",
+        }
+    }
+    else {
+        file { "/etc/nginx/sites-enabled/${basename}":
+            ensure => absent
         }
     }
 }
