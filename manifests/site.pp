@@ -19,9 +19,6 @@
 #   'present' or 'absent'; whether the site configuration is
 #   installed or removed in sites-available/
 #
-# [*enabled*]
-#   Boolean; true by default.
-#
 # === Examples
 #
 #  nginx::site { 'graphite':
@@ -29,32 +26,22 @@
 #  }
 #
 define nginx::site(
+    $ensure  = present,
     $content = undef,
     $source  = undef,
-    $ensure  = present,
-    $enabled = true,
-)
-{
+) {
     include ::nginx
 
-    $basename = regsubst($title, '\W', '-', 'G')
+    $basename = regsubst($title, '[\W_]', '-', 'G')
 
     file { "/etc/nginx/sites-available/${basename}":
+        ensure  => $ensure,
         content => $content,
         source  => $source,
-        ensure  => $ensure
     }
 
-    if $ensure == 'present' and $enabled == true {
-        file { "/etc/nginx/sites-enabled/${basename}":
-            require => File["/etc/nginx/sites-available/${basename}"],
-            ensure  => link,
-            target  => "/etc/nginx/sites-available/${basename}",
-        }
-    }
-    else {
-        file { "/etc/nginx/sites-enabled/${basename}":
-            ensure => absent
-        }
+    file { "/etc/nginx/sites-enabled/${basename}":
+        ensure => ensure_link($ensure),
+        target => "/etc/nginx/sites-available/${basename}",
     }
 }
