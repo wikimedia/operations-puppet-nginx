@@ -75,4 +75,21 @@ class nginx(
         File <| tag == 'nginx' |> -> Service['nginx']
         File <| tag == 'ssl' |> -> Service['nginx']
     }
+
+    # The jessie conditional here is just to limit the changes to
+    #  new reinstalls under examination without disturbing the
+    #  running precise machines - can be removed later, is not real.
+    if os_version('debian >= jessie') and $::realm == 'production' {
+        # nginx will buffer e.g. large body content into this directory
+        #  very briefly, so keep it off the disks.
+        mount { '/var/lib/nginx':
+            ensure  => mounted,
+            device  => 'tmpfs',
+            fstype  => 'tmpfs',
+            options => 'defaults,noatime,uid=0,gid=0,mode=755,size=1g',
+            pass    => 0,
+            dump    => 0,
+            before  => Service['nginx'],
+        }
+    }
 }
