@@ -34,6 +34,7 @@ class nginx(
 
     service { 'nginx':
         enable     => true,
+        ensure     => running,
         provider   => 'debian',
         hasrestart => true,
         require    => Package["nginx-${variant}"],
