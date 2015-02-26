@@ -25,6 +25,5 @@ class nginx::ssl (
         group   => 'root',
         mode    => '0444',
         content => template('nginx/ssl.conf.erb'),
-        require => Package['nginx-common']
     }
 }

@@ -51,7 +51,6 @@ class nginx(
         ensure     => running,
         provider   => 'debian',
         hasrestart => true,
-        require    => Package["nginx-${variant}"],
     }
 
     file { [ '/etc/nginx/conf.d', '/etc/nginx/sites-available', '/etc/nginx/sites-enabled' ]:
@@ -59,17 +58,20 @@ class nginx(
         recurse => true,
         purge   => true,
         force   => true,
-        require => Package["nginx-${variant}"],
     }
 
     # Order package -> config -> service for all
     #  nginx-tagged config files (including all File resources
     #  declared within this module), and set up the
     #  notification for config~>service if $managed.
+    # Also set up ssl tag -> service similarly, for certs
+    Package["nginx-${variant}"] -> File <| tag == 'nginx' |>
     if $managed {
-        Package["nginx-${variant}"] -> File <| tag == 'nginx' |> ~> Service['nginx']
+        File <| tag == 'nginx' |> ~> Service['nginx']
+        File <| tag == 'ssl' |> ~> Service['nginx']
     }
     else {
-        Package["nginx-${variant}"] -> File <| tag == 'nginx' |> -> Service['nginx']
+        File <| tag == 'nginx' |> -> Service['nginx']
+        File <| tag == 'ssl' |> -> Service['nginx']
     }
 }
