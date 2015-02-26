@@ -62,7 +62,14 @@ class nginx(
         require => Package["nginx-${variant}"],
     }
 
+    # Order package -> config -> service for all
+    #  nginx-tagged config files (including all File resources
+    #  declared within this module), and set up the
+    #  notification for config~>service if $managed.
     if $managed {
-        File <| tag == 'nginx' |> ~> Service['nginx']
+        Package["nginx-${variant}"] -> File <| tag == 'nginx' |> ~> Service['nginx']
+    }
+    else {
+        Package["nginx-${variant}"] -> File <| tag == 'nginx' |> -> Service['nginx']
     }
 }
