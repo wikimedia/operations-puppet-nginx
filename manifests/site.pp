@@ -38,10 +38,12 @@ define nginx::site(
         ensure  => $ensure,
         content => $content,
         source  => $source,
+        tag     => 'nginx',
     }
 
     file { "/etc/nginx/sites-enabled/${basename}":
         ensure => ensure_link($ensure),
         target => "/etc/nginx/sites-available/${basename}",
+        tag     => 'nginx',
     }
 }

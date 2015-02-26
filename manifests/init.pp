@@ -58,6 +58,7 @@ class nginx(
         recurse => true,
         purge   => true,
         force   => true,
+        tag     => 'nginx',
     }
 
     # Order package -> config -> service for all
