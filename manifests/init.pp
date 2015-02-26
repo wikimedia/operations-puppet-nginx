@@ -32,6 +32,20 @@ class nginx(
 
     package { [ "nginx-${variant}", 'nginx-common' ]: }
 
+    # In the unmanaged case, this prevents the scenario where after the
+    # initial puppet run that installs the package, the net resulting state is
+    # a fully deployed configuration on disk, but the running instance still
+    # running the default configuration from the package.  With this, it gets
+    # stopped before the service clause checks->starts it with good config.
+    if ! $managed {
+        exec { 'stop-default-nginx':
+            command => '/usr/sbin/service nginx stop',
+            subscribe => Package["nginx-${variant}"],
+            refreshonly => true,
+            before => Service['nginx'],
+        }
+    }
+
     service { 'nginx':
         enable     => true,
         ensure     => running,
