@@ -90,6 +90,7 @@ class nginx(
             pass    => 0,
             dump    => 0,
             before  => Service['nginx'],
+            require => Package["nginx-${variant}"],
         }
     }
 }
