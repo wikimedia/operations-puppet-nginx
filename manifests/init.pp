@@ -39,16 +39,16 @@ class nginx(
     # stopped before the service clause checks->starts it with good config.
     if ! $managed {
         exec { 'stop-default-nginx':
-            command => '/usr/sbin/service nginx stop',
-            subscribe => Package["nginx-${variant}"],
+            command     => '/usr/sbin/service nginx stop',
+            subscribe   => Package["nginx-${variant}"],
             refreshonly => true,
-            before => Service['nginx'],
+            before      => Service['nginx'],
         }
     }
 
     service { 'nginx':
-        enable     => true,
         ensure     => running,
+        enable     => true,
         provider   => 'debian',
         hasrestart => true,
     }
