@@ -22,22 +22,26 @@
 #   'nginx-full', 'nginx-light' or 'nginx-extras' packages.
 #
 class nginx(
+    $ensure = 'present',
     $managed = true,
     $variant = 'full',
-)
-{
+) {
+    validate_re($ensure, ['^present$', '^absent$'])
+
     if $variant !~ /^(full|extras|light$)/ {
         fail("'variant' must be 'full', 'extras', or 'light' (got: '${variant}').")
     }
 
-    package { [ "nginx-${variant}", 'nginx-common' ]: }
+    package { [ "nginx-${variant}", 'nginx-common' ]:
+        ensure => $ensure,
+    }
 
     # In the unmanaged case, this prevents the scenario where after the
     # initial puppet run that installs the package, the net resulting state is
     # a fully deployed configuration on disk, but the running instance still
     # running the default configuration from the package.  With this, it gets
     # stopped before the service clause checks->starts it with good config.
-    if ! $managed {
+    if ! $managed and ($ensure == 'present') {
         exec { 'stop-default-nginx':
             command     => '/usr/sbin/service nginx stop',
             subscribe   => Package["nginx-${variant}"],
@@ -47,14 +51,14 @@ class nginx(
     }
 
     service { 'nginx':
-        ensure     => running,
+        ensure     => ensure_service($ensure),
         enable     => true,
         provider   => 'debian',
         hasrestart => true,
     }
 
     file { [ '/etc/nginx/conf.d', '/etc/nginx/sites-available', '/etc/nginx/sites-enabled' ]:
-        ensure  => directory,
+        ensure  => ensure_directory($ensure),
         recurse => true,
         purge   => true,
         force   => true,
@@ -83,7 +87,7 @@ class nginx(
         # nginx will buffer e.g. large body content into this directory
         #  very briefly, so keep it off the disks.
         mount { '/var/lib/nginx':
-            ensure  => mounted,
+            ensure  => ensure_mounted($ensure),
             device  => 'tmpfs',
             fstype  => 'tmpfs',
             options => 'defaults,noatime,uid=0,gid=0,mode=755,size=1g',
