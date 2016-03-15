@@ -52,7 +52,7 @@ class nginx(
 
     service { 'nginx':
         ensure     => ensure_service($ensure),
-        enable     => true,
+        enable     => ($ensure == 'present'),
         provider   => 'debian',
         hasrestart => true,
     }

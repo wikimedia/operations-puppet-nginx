@@ -14,8 +14,8 @@ describe 'nginx', :type => :class do
       should contain_package('nginx-full').with({'ensure' => 'present'})
     end
 
-    it 'should ensure that nginx service is started' do
-      should contain_service('nginx').with({'ensure' => 'running'})
+    it 'should ensure that nginx service is started and enabled' do
+      should contain_service('nginx').with({'ensure' => 'running', 'enable' => true})
     end
 
     it 'should ensure that nginx configuration directories exist' do
@@ -33,8 +33,8 @@ describe 'nginx', :type => :class do
       should contain_package('nginx-full').with({'ensure' => 'absent'})
     end
 
-    it 'should ensure that nginx service is stopped' do
-      should contain_service('nginx').with({'ensure' => 'stopped'})
+    it 'should ensure that nginx service is stopped and disabled' do
+      should contain_service('nginx').with({'ensure' => 'stopped', 'enable' => false})
     end
 
     it 'should ensure that nginx configuration directories are removed' do
