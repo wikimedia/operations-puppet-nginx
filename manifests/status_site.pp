@@ -10,9 +10,12 @@
 # [*port*]
 #   Port to listen on. Defaults to 8080.
 #
-define nginx::status_site( $port = 8080 ) {
+define nginx::status_site(
+    $ensure = present,
+    $port   = 8080,
+) {
     nginx::site { 'status':
-        ensure  => present,
+        ensure  => $ensure,
         content => template('nginx/status.nginx.erb'),
     }
 }
