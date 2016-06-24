@@ -57,6 +57,11 @@ class nginx(
         hasrestart => true,
     }
 
+    exec { 'nginx-reload':
+        command     => '/usr/sbin/service nginx reload',
+        refreshonly => true,
+    }
+
     file { [ '/etc/nginx/conf.d', '/etc/nginx/sites-available', '/etc/nginx/sites-enabled' ]:
         ensure  => ensure_directory($ensure),
         recurse => true,
