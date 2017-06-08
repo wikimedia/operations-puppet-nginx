@@ -43,5 +43,4 @@ describe 'nginx', :type => :class do
       should contain_file('/etc/nginx/sites-enabled').with({'ensure' => 'absent'})
     end
   end
-
 end
