@@ -70,6 +70,14 @@ class nginx(
         tag     => 'nginx', # workaround PUP-2689, can remove w/ puppetmaster 3.6.2+
     }
 
+    if $variant == 'extras' {
+        file { '/etc/nginx/prometheus.lua':
+            ensure  => $ensure,
+            source  => 'puppet:///modules/nginx/prometheus.lua',
+            require => Package["nginx-${variant}"],
+        }
+    }
+
     # Order package -> config -> service for all
     #  nginx-tagged config files (including all File resources
     #  declared within this module), and set up the
