@@ -25,6 +25,7 @@ class nginx(
     $ensure = 'present',
     $managed = true,
     $variant = 'full',
+    $tmpfs_size = '1g',
 ) {
     validate_re($ensure, ['^present$', '^absent$'])
 
@@ -103,7 +104,7 @@ class nginx(
             ensure  => ensure_mounted($ensure),
             device  => 'tmpfs',
             fstype  => 'tmpfs',
-            options => 'defaults,noatime,uid=0,gid=0,mode=755,size=1g',
+            options => "defaults,noatime,uid=0,gid=0,mode=755,size=${tmpfs_size}",
             pass    => 0,
             dump    => 0,
             before  => Service['nginx'],
