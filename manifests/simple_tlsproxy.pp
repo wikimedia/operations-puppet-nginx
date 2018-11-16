@@ -11,7 +11,8 @@ class nginx::simple_tlsproxy( $backend_port, $site_name, $port=443,) {
     include ::nginx
     include ::nginx::ssl
 
-    diamond::collector::nginx{ $site_name:
+    # T209709
+    nginx::status_site { $site_name:
         port => 10080,
     }
 
