@@ -1,0 +1,1 @@
+The repository has been moved to [modules/nginx in operations/puppet.git](https://gerrit.wikimedia.org/g/operations/puppet/+/production/modules/nginx/) ([GitHub mirror](https://github.com/wikimedia/puppet/tree/production/modules/nginx))
